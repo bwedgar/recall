@@ -1,55 +1,525 @@
 <!DOCTYPE html>
 <html>
+<meta charset="UTF-8">
+
 <head>
-<meta charset="UTF-8"> 
-<meta name="viewport" content="width=device-width" />
-<link rel="stylesheet" href="style.css" /> </head> <body> <table id="selectedItemsTable">
-<tr onclick="clickTable(this)"> <td></td>
-<td style="display:none;"></td> </tr>
-<tr onclick="clickTable(this)"> <td ></td> <td style="display:none;"></td> </tr> <tr onclick="clickTable(this)"> 
-<td ></td> <td style="display:none;"></td> </tr> <tr onclick="clickTable(this)"> <td></td> <td style="display:none;"></td> </tr> <tr onclick="clickTable(this)"> <td></td> 
-<td style="display:none;"></td> </tr> </table> <input type="text" id="search" oninput="updateTable(this)"> <button type="button" onclick="addNewItem()">Add New</button> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <style>
+    body,
+    input[type=text] {
+      font-size: 4vw;
+      font-family: Arial;
+      color: black;
+    }
 
-<table id="linksTable"> <tr onclick="clickLinksTable(this)"> <td></td> <td></td> <td></td> </tr> <tr onclick="clickLinksTable(this)"> <td></td> <td></td> <td></td> </tr>
-<tr onclick="clickLinksTable(this)"> <td></td> <td></td> <td></td> </tr> <tr onclick="clickLinksTable(this)"> <td></td> <td></td> <td></td> </tr> </table> 
+    input[type=text] {
+      width: 40%;
+    }
 
-<input type="text" id="description" oninput="updateTable(this)";> 
+    input[type=button] {
+      width: 6%;
+      font-family: Arial;
+      font-size: 40vw;
+    }
 
-<input type="text" id="linkTo" > <button type="button" onclick="addNewItem()">Add New</button> 
+    .tableContainer {
+      height: 150px;
+      overflow-y: auto;
+    }
 
-<script src="https://unpkg.com/dexie/dist/dexie.js"></script> 
+    .table {
+      position: sticky;
+      top: 0;
+      width: 100%;
+    }
 
-<script>
+    .id {
+      display: none;
+    }
 
-selectedItemsTable=document.getElementById("selectedItemsTable");
-rows=0; operation="search";
-linksTable=document.getElementById("linksTable");
-//when an item is selected frim the search table ... function clickTable(x) { rows=0 for (row of linksTable.rows){ for (cell of row.cells) { cell.innerHTML="" } }
-//if the operation is search (or add) item //add the links for the item to other items 
-db.links.where("idFrom") .equals( parseInt(x.cells[1].innerHTML)) 
-.toArray() 
-.then(array =>{ array.map((e,i)=>{ rows++ db.items.get(e.idTo) 
-.then(a=>a.item) 
-.then(w=>linksTable.rows[i].cells[1].innerHTML=w.toString()) db.items.get(e.idDesc) 
-.then(a=>a.item) .then(w=>linksTable.rows[i].cells[0].innerHTML=" is "+w.toString()) }) }) 
-//add the links to the item 
-db.links.where("idTo") 
-.equals( parseInt(x.cells[1].innerHTML)) 
-.toArray() .then(array =>{ array.map((e,i)=>{ db.items.get(e.idFrom) 
-.then(a=>a.item) .then(w=>linksTable.rows[i+rows].cells[0].innerHTML=w.toString()+" is ") 
-db.items.get(e.idDesc) 
-.then(a=>a.item) 
-.then(w=>linksTable.rows[i+rows].cells[1].innerHTML=w.toString()) }) }) } 
-function updateTable(e) { 
-operation ="search"; showItems(e.value); } 
+    .description {
+      font-family: Arial;
+      font-size: 3vw;
+    }
 
-function addNewItem() { db.items.add({item: search.value}); } 
+    #description {
+      font-family: Arial;
+      font-size: 3vw;
+    }
+  </style>
+</head>
 
-function clickLinksTable() { } var db = new Dexie("links9"); db.version(1).stores({ items: " ++id, item", links: " ++idLink, idFrom, idTo, idDesc" }); 
+<body>
 
-function populateDb(){ db.items.bulkPut([ { item: "King Charles" }, { item: "Prince Harry" }, { item: "Prince William" }, { item: "Archie" }, { item: "Father of" }, { item: "Queen Elizabeth"}, { item: "Queen Mary"}, { item: "Diana Spencer"}, { item: "mother of"}, { item: "spouse of"}, { item: "Kate Middleton"} ]); 
-db.links.bulkPut([ { idFrom: 1, idTo: 2, idDesc: 5}, { idFrom: 1, idTo: 3, idDesc: 5}, { idFrom: 6, idTo: 1, idDesc: 9} ]); } 
+  <div class="tableContainer">
+    <table id="selectItemTable" class="table">
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+      <tr onclick="clickTable(this)">
+        <td></td>
+        <td style="display:none;"></td>
+      </tr>
+    </table>
+  </div>
 
-populateDb(); //search for an item function showItems(string) { //clear search table for (row of selectedItemsTable.rows){ for (cell of row.cells) { cell.innerHTML="" } }db.items.where("item").startsWithAnyOfIgnoreCase(string).toArray().then( selectedItems => { for (i=0;i<3;i++) { selectedItemsTable.rows[i].cells[0].innerHTML=selectedItems[i].item; selectedItemsTable.rows[i].cells[1].innerHTML=selectedItems[i].id; } }); } showItems("a");
+  <input type="text" id="search" spellcheck="false" autocomplete="off" autocapitalize="none" oninput="operation='showLinksForSelectedItemAfterSelectingItem';searchItem=this.value;showItems();" onfocus="clearLinksTable();this.value=''">
 
-</script> </body> </html>
+  <input type="button" value="&#10133;" onclick="checkIfNewItem(search.value,'idFrom')">
+  <input type="button" value="&#128270;" onclick=window.open("https://www.google.com/search?q="+search.value,"_blank")> <input type="button" value="&#9998;" onclick="edit(search.value)">
+
+  <input type="button" value="&#10060;" onclick="deleteItem(search.value)">
+
+
+  <div class="tableContainer">
+    <table id="selectLinkTable" class="table">
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+      <tr onclick="clickLinksTable(this)">
+        <td class="description"></td>
+        <td class="id"></td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+
+
+  <input type="text" id="description" spellcheck="false" autocomplete="off" autocapitalize="none" oninput="operation='addDescriptionToInput';searchItem=this.value;showItems()">
+
+  <input type="text" id="linkTo" spellcheck="false" autocomplete="off" autocapitalize="none" oninput="operation='setItemTo and linkTo';searchItem=this.value;showItems()"
+    onfocus="console.log('The description is: '+description.value);checkIfNewItem(description.value,'idDescription');">
+
+  <input type="button" value="&#10133;" onclick="addNewLink()">
+
+  <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+
+  <script>
+    selectItemTable = document.getElementById("selectItemTable");
+    selectLinkTable = document.getElementById("selectLinkTable");
+    descriptionInput = document.getElementById("description");
+    linkToInput = document.getElementById("linkTo");
+    rows1 = 0;
+    operation = "showLinksForSelectedItemAfterSelectingItem";
+    id = 0;
+    idFrom = 0; //this is the item id that is being linked from
+    idTo = 0;
+    idDescription = 0;
+    itemFrom = "";
+    itemTo = "";
+    itemDescription = "";
+    idType = "";
+    searchItem = "";
+
+    itemFound = 0;
+
+    //makes new database if it does not exist
+    var db = new Dexie("links30");
+    db.version(1).stores({
+      items: " ++id, item",
+      links: " ++idLink, idFrom, idTo, idDesc"
+    });
+
+    //the following functions relate to the TABLE OF ITEMS
+
+    //show the items for the string entered in the search input box
+
+    function showItems() {
+      clearItemsTable();
+      db.items.where("item").startsWithAnyOfIgnoreCase(searchItem)
+        .toArray()
+        .then(selectedItems => {
+          for (i = 0; i < 100; i++) {
+            selectItemTable.rows[i].cells[0].innerHTML = selectedItems[i].item.match(/^[^/]*/);
+            selectItemTable.rows[i].cells[1].innerHTML = parseInt(selectedItems[i].id);
+          }
+          itemFound = 1;
+        })
+        .catch(e => {
+          itemFound = 0;
+        })
+    }
+
+    function clickTable(itemTableRow) {
+      itemFound = 1;
+      console.log("AT clickTable  itemFound: " + itemTableRow.cells[0].innerHTML + " operation: " + operation)
+      //when an item is clicked on the item table when the itemFrom is being selected show the links for this
+
+
+      if (operation == "showLinksForSelectedItemAfterSelectingItem") {
+        itemFrom = itemTableRow.cells[0].innerHTML;
+        idFrom = parseInt(itemTableRow.cells[1].innerHTML);
+        search.value = itemFrom.match(/^[^/]*/);
+        showLinksForSelectedItem();
+      }
+
+      if (operation == "setItemTo and linkTo") {
+        itemTo = itemTableRow.cells[0].innerHTML;
+        idTo = parseInt(itemTableRow.cells[1].innerHTML);
+        linkTo.value = itemTo;
+      }
+
+      if (operation == "addDescriptionToInput") {
+        itemDescription = itemTableRow.cells[0].innerHTML;
+        idDescription = parseInt(itemTableRow.cells[1].innerHTML);
+        description.value = itemDescription;
+        console.log("AT addItemToDescriptionInput  itemDescription: " + itemDescription + " idDescription: " + idDescription)
+
+      }
+    }
+
+    //if the NEW ITEM button is clicked OR
+    //if the onfocus event from the Description box is triggered
+    //     then add the item to the database then show the links for the item with the value in the search input box
+
+    function checkIfNewItem(value, idType) {
+      console.log("At checkIfNewItem  value: " + value + " idType: " + idType)
+      db.items.where("item").startsWithAnyOfIgnoreCase(value)
+        .toArray()
+        .then(e => {
+
+          id = parseInt(e[0].id)
+          console.log("this is not a new item :" + value + " id: " + id)
+          if (idType == "idFrom") {
+            idFrom = id
+          }
+          if (idType == "idDescription") {
+            idDescription = id
+
+            console.log("added idDescription: " + idDescription);
+          }
+          if (idType == "idTo") {
+            idTo = id;
+            db.links.add({
+              idFrom: idFrom,
+              idTo: idTo,
+              idDesc: idDescription
+            }).then(e => {
+              clearNewLinkBoxes();
+              showLinksForSelectedItem();
+              console.log("Adding a new link  idFrom: " + idFrom + " idTo: " + idTo + " idDescription: " + idDescription)
+            })
+          }
+        })
+        .catch(e => { //this executes if it is a new item
+          //  console.log("adding a new item: " + value)
+          db.items.add({
+            item: value
+          })
+          //find the id of the new item just added
+          db.items.orderBy(":id").last().then(e => {
+            id = e.id //the id of the item just added
+            item = e.item;
+            console.log("adding a new item after findng last entry, id: " + id + " item: " + value)
+            if (idType == "idFrom") {
+              idFrom = id
+              itemFrom = item
+            }
+            if (idType == "idDescription") {
+              idDescription = id
+              console.log("added idTo: " + idTo);
+            }
+            if (idType == "idTo") {
+              idTo = id;
+              db.links.add({
+                  idFrom: idFrom,
+                  idTo: idTo,
+                  idDesc: idDescription
+                })
+                .then(e => {
+                  clearNewLinkBoxes();
+                  showLinksForSelectedItem();
+                  console.log("Adding a new link  idFrom: " + idFrom + " idTo: " + idTo + " idDescription: " + idDescription)
+                })
+            }
+          })
+        })
+
+
+
+
+      if (operation == "showLinksForSelectedItemAfterSelectingItem") {
+        itemFrom = value
+        idFrom = id;
+        search.value = itemFrom;
+        showLinksForSelectedItem();
+      }
+
+
+      if (operation == "addDescriptionToInput") {
+        itemDescription = value
+        idDescription = id;
+        console.log("AT addItemToDescriptionInput  itemDescription: " + itemDescription + " idDescription: " + idDescription)
+      }
+
+    }
+
+    function deleteItem() {
+      //removes the item from the item table and any records in the link table that use its id
+      //find the item in the item table and delete it
+      db.items.where("item").startsWithAnyOfIgnoreCase(search.value)
+        .toArray()
+        .then(e => {
+
+          id = parseInt(e[0].id)
+          console.log(" at delete item id: " + id)
+          db.items.where("id").equals(id).delete();
+          db.links.where("idFrom").equals(id).delete();
+          db.links.where("idTo").equals(id).delete();
+          db.links.where("idDesc").equals(id).delete();
+        })
+    }
+
+    //db.links.where("idTo").equals(4).delete();
+    //  db.links.where("idFrom").equals(4).delete();
+    //  db.links.where("idDesc").equals(4).delete();
+    //  console.log("deleted 4 id")
+
+    function edit() {
+      db.items.where("item").startsWithAnyOfIgnoreCase(search.value)
+        .toArray()
+        .then(e => {
+          id = parseInt(e[0].id)
+          console.log(" at edit item id: " + id)
+          nameEdited = prompt("edit", search.value);
+          db.items.update(id, {
+              item: nameEdited
+            })
+            .then(e => {
+              console.log("updated id: " + id + " name edited: " + nameEdited)
+            })
+        })
+    }
+
+
+    // The following functions relate to the TABLE OF LINKS
+
+
+
+
+    //show the links for a selected itemFrom
+
+    function showLinksForSelectedItem() {
+      console.log("idFrom in showLinks...  " + idFrom)
+      search.value = itemFrom;
+      clearItemsTable();
+      clearLinksTable();
+      rows1 = 0;
+      db.links.where("idFrom")
+        .equals(parseInt(idFrom))
+        .toArray()
+        .then(array => {
+          array.map((e, i) => {
+            rows1++
+            selectLinkTable.rows[i].cells[1].innerHTML = e.idTo
+            db.items.get(e.idTo)
+              .then(a => a.item)
+              .then(w => {
+                selectLinkTable.rows[i].cells[2].innerText = w.toString()
+              })
+            db.items.get(e.idDesc)
+              .then(a => a.item)
+              .then(w => selectLinkTable.rows[i].cells[0].innerHTML = w.toString().match(/^[^/]*/))
+          })
+          //add the links where the idFrom is the idTo in the link table
+
+          db.links.where("idTo")
+            .equals(parseInt(idFrom))
+            .toArray().then(array => {
+              array.map((e, i) => {
+                //  rows1++;
+                //    console.log("idFrom: " + e.idFrom)
+                selectLinkTable.rows[rows1 + i].cells[1].innerHTML = e.idFrom
+                db.items.get(e.idFrom)
+                  .then(a => a.item).then(w => {
+                    selectLinkTable.rows[rows1 + i].cells[2].innerText = w.toString()
+                  })
+                db.items.get(e.idDesc)
+                  .then(a => a.item)
+                  .then(w => selectLinkTable.rows[rows1 + i].cells[0].innerHTML = w.toString().match(/[^/]*$/))
+              })
+            })
+            .then(e => {
+              sortTable();
+            })
+        })
+    }
+
+    // if an item in the link table is clicked make this the selected item and show the links for it
+
+    function clickLinksTable(linkTableRow) {
+      console.log("at clickLinksTable  " + linkTableRow)
+      clearItemsTable();
+      itemFrom = linkTableRow.cells[2].innerHTML;
+      search.value = itemFrom;
+      idFrom = parseInt(linkTableRow.cells[1].innerHTML);
+      //  console.log("clicked links table  idSelected: " + idFrom)
+      showLinksForSelectedItem()
+    }
+
+    // The following functions relate to adding a itemTo and its description
+
+
+    //if the item table is clicked after losing focus to the itemTo field then add selected  item or add a new item
+    function addItemToLinkToField() {
+      // if this is a new item then add it to the database
+      itemTo = linkTo.value;
+      console.log("AT addItemToLinkToField link.To:  " + itemTo + " idTo: " + idTo)
+    }
+
+
+
+    //if this is a new link then add it
+    function addNewLink() {
+      //  checkIfNewItem(description.value, "idDescription")
+      checkIfNewItem(linkTo.value, "idTo")
+      clearNewLinkBoxes();
+      showLinksForSelectedItem(); //AfterAddingLink()
+    }
+
+    //then show the links for it
+    function showLinksForSelectedItemAfterAddingLink() {
+      search.value = itemFrom;
+      linkTo.value = ""
+      description.value = ""
+      //  console.log("idFrom: "+idFrom)
+      showLinksForSelectedItem()
+    }
+
+
+    function clearLinksTable() {
+      for (row of selectLinkTable.rows) {
+        for (cell of row.cells) {
+          cell.innerHTML = ""
+        }
+      }
+    }
+
+    function clearItemsTable() {
+      for (row of selectItemTable.rows) {
+        for (cell of row.cells) {
+          cell.innerHTML = ""
+        }
+      }
+    }
+
+    function clearNewLinkBoxes() {
+      linkTo.value = "";
+      description.value = "";
+    }
+
+    function sortTable() {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = selectLinkTable;
+      switching = true;
+      /* Make a loop that will continue until
+      no switching has been done: */
+      while (switching) {
+        // Start by saying: no switching is done:
+        switching = false;
+        rows = table.rows;
+        /* Loop through all table rows (except the
+        first, which contains table headers): */
+        for (i = 0; i < (rows.length); i++) {
+          // Start by saying there should be no switching:
+          shouldSwitch = false;
+          /* Get the two elements you want to compare,
+          one from current row and one from the next: */
+          x = rows[i].getElementsByTagName("td")[2];
+          //  console.log(x.innerText)
+          y = rows[i + 1].getElementsByTagName("td")[2];
+          // Check if the two rows should switch place:
+          if (x.innerText.toLowerCase() > y.innerText.toLowerCase() && x.innerText.toLowerCase() > "" && y.innerText.toLowerCase() > "") {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        }
+        if (shouldSwitch) {
+          /* If a switch has been marked, make the switch
+          and mark that a switch has been done: */
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
